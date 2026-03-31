@@ -1,71 +1,100 @@
 # Poem Helper
 
-Poem Helper is a command-line tool developed in C++ (C++98 standard) designed to assist in poem composition. It calculates syllable counts based on French versification rules, manages poem storage in memory, and allows for file exportation.
+Poem Helper is a C++98 command-line assistant for writing French poetry.
+It counts syllables, stores verses in memory, displays annotated lines, and exports poems to a text file.
 
 ## Features
 
-- Syllable Counting: Accurate count based on vowel groups and specific rules for the silent 'e'.
-- Poem Management: Store multiple verses in a sequence using a dedicated container.
-- File Export: Save your composed poem into an external text file.
-- Error Handling: Custom exception implementation for file stream management.
-- Terminal Styling: ANSI escape codes for clear and structured output.
-- UTF-8 Support: Proper handling of French accented characters (multi-byte sequences).
+- Syllable counting for French-like versification rules.
+- Verse classification (Monosyllabe -> Alexandrin -> Vers long).
+- Poem management in memory (`ADD`, `DISPLAY`).
+- File export (`SAVE`).
+- Interactive shell with GNU Readline:
+  - Up/Down arrow history navigation.
+  - Tab autocompletion for commands.
+- ANSI color output for readability.
 
-## Compilation
+## Dependencies
 
-The project includes a Makefile that follows 42 school standards.
+- C++ compiler (`c++`) with C++98 support.
+- GNU Readline development library.
 
-1. Clone the repository:
-    ```sh
-    git clone <repository-url>
-    cd poem_helper
-    ```
+On Debian/Ubuntu:
 
-2. Compile the project:
-    ```sh
-    make
-    ```
+```sh
+sudo apt update
+sudo apt install build-essential libreadline-dev
+```
 
-3. Run the executable:
-    ```sh
-    ./poem_helper
-    ```
+## Build And Run
 
-## Usage
+```sh
+make
+./poem_helper
+```
 
-The program runs in an interactive loop. Type your verse to see the syllable count immediately.
+Useful targets:
 
-Special Commands:
-- ADD: Stores the last entered verse into the poem.
-- DISPLAY: Prints the current state of the stored poem.
-- SAVE: Triggers the file export process (asks for a filename).
-- CTRL+D: Exits the program.
+```sh
+make clean
+make fclean
+make re
+```
 
-Example:
-Input: Demain des l'aube
-Syllables: 4
-Input: ADD
-Added: Demain des l'aube
+## Commands
+
+At the main prompt (`input :`):
+
+- `ADD`: add the last entered verse to the poem buffer.
+- `DISPLAY`: show all stored verses with syllable count and verse type.
+- `SAVE`: ask for a filename and export the poem.
+- `EXIT`: quit the program.
+
+Keyboard behavior:
+
+- `Tab`: autocomplete available commands.
+- `Up` / `Down`: navigate command history.
+- `Ctrl+D`: quit (EOF).
+
+## Example Session
+
+```text
+input : Demain des l'aube
+Syllabes : 4
+input : ADD
+Added : Demain des l'aube
+input : DISPLAY
+Poem :
+1. Demain des l'aube Count : 4 (Tetrasyllabe)
+input : SAVE
+Filename : mon_poeme.txt
+Save the poem as mon_poeme.txt
+input : EXIT
+```
 
 ## Project Structure
 
-- inc/SyllabCounter.hpp: Class declaration and exception definitions.
-- inc/Color.hpp: ANSI color macros.
-- src/SyllabCounter.cpp: Core logic and syllable counting algorithms.
-- main.cpp: User interface and command loop.
-- Makefile: Build instructions.
+- `main.cpp`: interactive application flow.
+- `inc/SyllabCounter.hpp`: syllable counter class and custom exception.
+- `src/SyllabCounter.cpp`: syllable and verse-type logic.
+- `inc/InputHandler.hpp`: C++ wrapper for interactive input.
+- `src/InputHandler.cpp`: Readline integration (history + completion).
+- `inc/Color.hpp`: terminal color macros.
+- `Makefile`: build rules and linker flags.
 
-## Algorithmic Logic
+## Syllable Counting Rules (Current Implementation)
 
-The syllable counting engine follows these principles:
-1. Vowel Grouping: Consecutive vowels (e.g., "eau", "ai") are counted as a single phonetic unit.
-2. Silent 'e' Rules: 
-   - A final 'e' is ignored if it is at the end of a verse.
-   - A final 'e' is ignored if the following word starts with a vowel (Elision).
-3. UTF-8 Management: Manual offset handling for two-byte characters like 'é' or 'à' to prevent indexing errors.
+1. Consecutive vowels are grouped as one sound unit.
+2. Silent final `e` can be ignored:
+   - at end of verse,
+   - or before a following word starting with a vowel.
+3. UTF-8 accented vowels are handled as vowel units.
 
-## Exception Management
+## Errors And Exceptions
 
-The program implements a custom exception, FileNotOpenException, which inherits from std::exception. It is thrown during the SAVE process if the output stream fails to initialize or the file cannot be accessed.
+`SAVE` throws `FileNotOpenException` if output file creation/open fails.
 
----
+## Notes
+
+- The `ADD` command stores the last non-command input currently held in memory.
+- Syllabification is heuristic and may differ from strict literary scansion in edge cases.
