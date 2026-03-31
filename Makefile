@@ -1,0 +1,47 @@
+NAME        = poem_helper
+
+OBJ_DIR     = objs
+
+RED		= \033[0;31m
+GREEN	= \033[0;32m
+YELLOW	= \033[0;33m
+BLUE	= \033[0;34m
+CYAN	= \033[0;36m
+RESET	= \033[0m
+
+SRCS_PATH = src/
+
+SRCS        = main.cpp\
+			$(SRCS_PATH)SyllabCounter.cpp
+			
+
+OBJS        = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
+
+CC          = c++
+CFLAGS      = -Wall -Wextra -Werror -std=c++98
+
+all: $(NAME)
+
+$(NAME): $(OBJS)
+	@echo "$(CYAN)🔧 Linking: $(NAME)$(RESET)"
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	@echo "$(GREEN)✅ Compilation terminée avec succès !$(RESET)"
+
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@echo "$(YELLOW)📝 Compiling: $<$(RESET)"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+
+clean:
+	@echo "$(YELLOW)🧹 Cleaning objects...$(RESET)"
+	@rm -rf $(OBJ_DIR)
+
+fclean: clean
+	@echo "$(RED)🗑️  Full clean...$(RESET)"
+	@rm -f $(NAME)
+
+re: fclean all
+	@echo "$(GREEN)♻️  Rebuilding project...$(RESET)"
+
+.PHONY: all clean fclean re
