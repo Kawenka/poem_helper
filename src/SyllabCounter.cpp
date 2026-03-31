@@ -17,19 +17,21 @@ SyllableCounter &SyllableCounter::operator=(SyllableCounter const &rhs)
 	return (*this);
 }
 
-bool	SyllableCounter::_isVowel(std::string const &s, size_t &i) const
+bool SyllableCounter::_isVowel(std::string const &s, size_t &i) const
 {
-	std::string v = "aeiouyAEIOUY";
-	
+    std::string v = "aeiouyAEIOUY";
 
-		return (true);
-	/* Gestion UTF-8 pour les accents (0xC3 est le premier octet) */
-	if (static_cast<unsigned char>(s[i]) == 0xC3 && i + 1 < s.length())
-	{
-		i++;
-		return (true);
-	}
-	return (false);
+    if (v.find(s[i]) != std::string::npos)
+    {
+        return (true);
+    }
+
+    if (static_cast<unsigned char>(s[i]) == 0xC3 && i + 1 < s.length())
+    {
+        i++;
+        return (true);
+    }
+    return (false);
 }
 
 bool	SyllableCounter::_startsWithVowel(std::string const &word) const
