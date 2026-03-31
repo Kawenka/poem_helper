@@ -33,6 +33,7 @@ class SyllableCounter
 		bool	_isVowel( std::string const &s, size_t &i ) const;
 		bool	_startsWithVowel( std::string const &word ) const;
 		int		_countWordSyllables( std::string const &word, bool isLastWord, bool nextStartsVowel ) const;
+        std::string _getTypeVerse( std::string const &verse ) const;
 };
 
 #endif

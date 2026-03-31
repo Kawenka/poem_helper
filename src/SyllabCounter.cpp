@@ -42,58 +42,101 @@ bool	SyllableCounter::_startsWithVowel(std::string const &word) const
 	return (this->_isVowel(word, i));
 }
 
-int		SyllableCounter::_countWordSyllables(std::string const &word, bool isLastWord, bool nextStartsVowel) const
+int SyllableCounter::_countWordSyllables(std::string const &word, bool isLastWord, bool nextStartsVowel) const
 {
-	int count = 0;
-	bool    inVowelGroup = false;
+    int     count = 0;
+    bool    inVowelGroup = false;
 
-	for (size_t i = 0; i < word.length(); ++i)
-	{
-		size_t startIdx = i;
-		if (this->_isVowel(word, i))
-		{
-			if (!inVowelGroup)
-			{
-				/* Règle de l'élision du 'e' muet */
-				if ((word[startIdx] == 'e' || word[startIdx] == 'E') && startIdx == word.length() - 1)
-				{
-					if (isLastWord || nextStartsVowel)
-						continue ;
-				}
-				count++;
-				inVowelGroup = true;
-			}
-		}
-		else
-			inVowelGroup = false;
-	}
-	return (count == 0 && !word.empty() ? 1 : count);
+    for (size_t i = 0; i < word.length(); ++i)
+    {
+        size_t startIdx = i;
+        if (this->_isVowel(word, i))
+        {
+            bool isHiatusE = false;
+            if (static_cast<unsigned char>(word[startIdx]) == 0xC3 && startIdx + 1 < word.length())
+            {
+                unsigned char secondByte = static_cast<unsigned char>(word[startIdx + 1]);
+                if (secondByte == 0xA9 || secondByte == 0xA8 || secondByte == 0xAA || secondByte == 0xAB)
+                    isHiatusE = true;
+            }
+
+            if (!inVowelGroup || isHiatusE)
+            {
+                if ((word[startIdx] == 'e' || word[startIdx] == 'E'))
+                {
+                    bool isEffectiveEnd = true;
+                    for (size_t j = i + 1; j < word.length(); ++j) {
+                        if (isalpha(word[j])) { 
+                            isEffectiveEnd = false;
+                            break;
+                        }
+                    }
+                    if (isEffectiveEnd && (isLastWord || nextStartsVowel))
+                        continue;
+                }
+                count++;
+                inVowelGroup = true;
+            }
+        }
+        else if (isalpha(word[i]))
+            inVowelGroup = false;
+    }
+    return (count == 0 && !word.empty() ? 1 : count);
 }
 
-int		SyllableCounter::countVerseSyllables(std::string const &verse) const
+std::string SyllableCounter::_getTypeVerse(std::string const &verse) const
 {
-	std::vector<std::string>	words;
-	size_t  start = 0;
-	size_t  end = verse.find(' ');
-	int total = 0;
+    int syllabes = countVerseSyllables(verse);
 
-	while (end != std::string::npos)
-	{
-		if (end > start)
-			words.push_back(verse.substr(start, end - start));
-		start = end + 1;
-		end = verse.find(' ', start);
-	}
-	if (start < verse.length())
-		words.push_back(verse.substr(start));
+    std::string types[] = {
+        "Monosyllabe",
+        "Dissyllabe",
+        "Trisyllabe",
+        "Tétrasyllabe",
+        "Pentasyllabe",
+        "Hexasyllabe",
+        "Heptasyllabe",
+        "Octosyllabe",
+        "Ennéasyllabe",
+        "Décasyllabe",
+        "Hendécasyllabe",
+        "Alexandrin"
+    };
 
-	for (size_t i = 0; i < words.size(); ++i)
-	{
-		bool isLastWord = (i == words.size() - 1);
-		bool nextVowel = (!isLastWord && _startsWithVowel(words[i + 1]));
-		total += _countWordSyllables(words[i], isLastWord, nextVowel);
-	}
-	return (total);
+    if (syllabes <= 0)
+        return ("Inconnu");
+    if (syllabes > 12)
+        return ("Vers long");
+    return types[syllabes - 1];
+}
+
+int SyllableCounter::countVerseSyllables(std::string const &verse) const
+{
+    std::vector<std::string>    words;
+    size_t                      start = 0;
+    size_t                      end = verse.find(' ');
+    int                         total = 0;
+
+    while (end != std::string::npos)
+    {
+        if (end > start)
+            words.push_back(verse.substr(start, end - start));
+        start = end + 1;
+        end = verse.find(' ', start);
+    }
+    if (start < verse.length())
+        words.push_back(verse.substr(start));
+
+    for (size_t i = 0; i < words.size(); ++i)
+    {
+        bool isLastWord = (i == words.size() - 1);
+        bool nextVowel = (!isLastWord && _startsWithVowel(words[i + 1]));
+        
+        int wordScore = _countWordSyllables(words[i], isLastWord, nextVowel);
+        
+        total += wordScore;
+    }
+    return (total);
 }
 
 void SyllableCounter::addVerse(std::string const &verse)
@@ -110,7 +153,10 @@ void SyllableCounter::displayPoem() const
     std::cout << YELLOW << "Poem : " << RESET << std::endl;
     for (int i = 0; i < size; i++)
     {
-         std::cout << this->_poem.at(i) << std::endl;
+         std::cout << YELLOW << i + 1 << ". " << this->_poem.at(i)
+            << GREEN << " Count : " << countVerseSyllables(this->_poem.at(i))
+            << YELLOW << " (" << _getTypeVerse(this->_poem.at(i)) << ")"
+            << RESET << std::endl;
     }
 }
 
