@@ -141,6 +141,11 @@ int SyllableCounter::countVerseSyllables(std::string const &verse) const
 
 void SyllableCounter::addVerse(std::string const &verse)
 {
+    if (!this->_poem.size())
+    {
+        std::cout << RED << "Error: poem empty" << RESET << std::endl;
+        return;
+    }
     this->_poem.push_back(verse);
     std::cout << GREEN << "Added : " <<  RESET << verse << std::endl;
 }
