@@ -47,6 +47,9 @@ int	main(void)
             }
         }
 
+        if (!verse.compare("EXIT"))
+            break;
+
         save = verse;
         std::cout << YELLOW << "Syllabes : " <<sc.countVerseSyllables(verse) << RESET << std::endl;
     }
