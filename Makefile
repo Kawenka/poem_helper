@@ -12,7 +12,8 @@ RESET	= \033[0m
 SRCS_PATH = src/
 
 SRCS        = main.cpp\
-			$(SRCS_PATH)SyllabCounter.cpp
+			$(SRCS_PATH)SyllabCounter.cpp\
+			$(SRCS_PATH)InputHandler.cpp
 			
 
 OBJS        = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)

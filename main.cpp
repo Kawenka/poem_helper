@@ -1,32 +1,26 @@
 #include "inc/SyllabCounter.hpp"
 #include "inc/Color.hpp"
+#include "inc/InputHandler.hpp"
 #include <string>
-#include <cstdlib>
-#include <readline/readline.h>
-#include <readline/history.h>
-
-static bool readPromptLine(const std::string &prompt, std::string &out)
-{
-    char *line = readline(prompt.c_str());
-
-    if (!line)
-        return (false);
-    out = line;
-    if (!out.empty())
-        add_history(line);
-    std::free(line);
-    return (true);
-}
+#include <vector>
 
 int	main(void)
 {
 	SyllableCounter	sc;
+    InputHandler    input;
     std::string verse;
     std::string save;
+    std::vector<std::string> commands;
+
+    commands.push_back("ADD");
+    commands.push_back("DISPLAY");
+    commands.push_back("SAVE");
+    commands.push_back("EXIT");
+    input.setCommands(commands);
 
     while (1)
     {
-        if (!readPromptLine(std::string(BOLD_WHITE) + "input : " + RESET, verse))
+        if (!input.readLine(std::string(BOLD_WHITE) + "input : " + RESET, verse))
             break;
 
         if (!verse.compare("ADD"))
@@ -46,7 +40,7 @@ int	main(void)
             try
             {
                 std::string filename;
-                if (!readPromptLine("Filename : ", filename))
+                if (!input.readLine("Filename : ", filename))
                 {
                     std::cout << RED << "Failed" << RESET << std::endl;
                     continue;
