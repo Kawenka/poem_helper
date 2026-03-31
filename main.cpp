@@ -1,6 +1,22 @@
 #include "inc/SyllabCounter.hpp"
 #include "inc/Color.hpp"
 #include <string>
+#include <cstdlib>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+static bool readPromptLine(const std::string &prompt, std::string &out)
+{
+    char *line = readline(prompt.c_str());
+
+    if (!line)
+        return (false);
+    out = line;
+    if (!out.empty())
+        add_history(line);
+    std::free(line);
+    return (true);
+}
 
 int	main(void)
 {
@@ -10,8 +26,7 @@ int	main(void)
 
     while (1)
     {
-        std::cout << BOLD_WHITE << "input : " << RESET;
-        if (!std::getline(std::cin, verse))
+        if (!readPromptLine(std::string(BOLD_WHITE) + "input : " + RESET, verse))
             break;
 
         if (!verse.compare("ADD"))
@@ -31,8 +46,7 @@ int	main(void)
             try
             {
                 std::string filename;
-                std::cout << "Filename : ";
-                if (!std::getline(std::cin, filename))
+                if (!readPromptLine("Filename : ", filename))
                 {
                     std::cout << RED << "Failed" << RESET << std::endl;
                     continue;

@@ -19,12 +19,13 @@ OBJS        = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
 CC          = c++
 CFLAGS      = -Wall -Wextra -Werror -std=c++98
+LDFLAGS     = -lreadline
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo -e "$(CYAN)🔧 Linking: $(NAME)$(RESET)"
-	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
 	@echo -e "$(GREEN)✅ Compilation terminée avec succès !$(RESET)"
 
 $(OBJ_DIR)/%.o: %.cpp
