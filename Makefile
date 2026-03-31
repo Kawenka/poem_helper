@@ -23,25 +23,25 @@ CFLAGS      = -Wall -Wextra -Werror -std=c++98
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@echo "$(CYAN)🔧 Linking: $(NAME)$(RESET)"
+	@echo -e "$(CYAN)🔧 Linking: $(NAME)$(RESET)"
 	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
-	@echo "$(GREEN)✅ Compilation terminée avec succès !$(RESET)"
+	@echo -e "$(GREEN)✅ Compilation terminée avec succès !$(RESET)"
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	@echo "$(YELLOW)📝 Compiling: $<$(RESET)"
+	@echo -e "$(YELLOW)📝 Compiling: $<$(RESET)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 
 clean:
-	@echo "$(YELLOW)🧹 Cleaning objects...$(RESET)"
+	@echo -e "$(YELLOW)🧹 Cleaning objects...$(RESET)"
 	@rm -rf $(OBJ_DIR)
 
 fclean: clean
-	@echo "$(RED)🗑️  Full clean...$(RESET)"
+	@echo -e "$(RED)🗑️  Full clean...$(RESET)"
 	@rm -f $(NAME)
 
 re: fclean all
-	@echo "$(GREEN)♻️  Rebuilding project...$(RESET)"
+	@echo -e "$(GREEN)♻️  Rebuilding project...$(RESET)"
 
 .PHONY: all clean fclean re
