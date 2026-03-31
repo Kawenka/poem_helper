@@ -1,4 +1,6 @@
 #include "../inc/SyllabCounter.hpp"
+#include "../inc/Color.hpp"
+#include <fstream>
 
 SyllableCounter::SyllableCounter(void) {}
 
@@ -90,4 +92,41 @@ int		SyllableCounter::countVerseSyllables(std::string const &verse) const
 		total += _countWordSyllables(words[i], isLastWord, nextVowel);
 	}
 	return (total);
+}
+
+void SyllableCounter::addVerse(std::string const &verse)
+{
+    this->_poem.push_back(verse);
+    std::cout << GREEN << "Added : " <<  RESET << verse << std::endl;
+}
+
+void SyllableCounter::displayPoem() const
+{
+    int size = this->_poem.size();
+    if (!size)
+        return;
+    std::cout << YELLOW << "Poem : " << RESET << std::endl;
+    for (int i = 0; i < size; i++)
+    {
+         std::cout << this->_poem.at(i) << std::endl;
+    }
+}
+
+void SyllableCounter::savePoem(std::string &filename) const
+{
+    int size = this->_poem.size();
+    if (!size)
+    {
+        std::cerr << RED << "Error: poem empty" << RESET << std::endl;
+        return;
+    }
+
+    std::ofstream outfile(filename.c_str());
+    if (!outfile.is_open())
+        throw SyllableCounter::FileNotOpenException();
+
+    for (int i = 0; i < size; i++)
+        outfile << this->_poem.at(i) << std::endl;
+    outfile.close();
+    std::cout << GREEN << "Save the poem as " << YELLOW << filename << RESET << std::endl;
 }
